@@ -26,8 +26,8 @@ class ProductCreate(BaseModel):
     name: str
     category: Optional[str] = None
     unit: Optional[str] = None
-    current_stock: Optional[float] = 0
-    minimum_stock: Optional[float] = 1
+    current_stock: Optional[int] = 0
+    minimum_stock: Optional[int] = 1
 
 class PriceCreate(BaseModel):
     product_id: int
@@ -80,3 +80,23 @@ def create_price(price: PriceCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_price)
     return db_price
+
+@app.get("/shopping-list")
+def get_shopping_list(db: Session = Depends(get_db)):
+    from .logic import get_shopping_list
+    return get_shopping_list(db)
+
+@app.patch("/products/{product_id}/stock")
+def update_stock(product_id: int, stock: int, db: Session = Depends(get_db)):
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    product.current_stock = stock
+    db.commit()
+    db.refresh(product)
+    return product
+
+@app.get("/prices/{product_id}/alert")
+def price_alert(product_id: int, db: Session = Depends(get_db)):
+    from .logic import check_price_alert
+    return check_price_alert(db, product_id)
