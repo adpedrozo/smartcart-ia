@@ -10,3 +10,15 @@ export const CATEGORIES = [
   'Panadería',
   'Otros',
 ]
+
+export const SUPERMARKETS = [
+  'Coto',
+  'Carrefour',
+  'Changomás',
+  'Dia',
+  'Disco',
+  'La Anonima',
+  'Jumbo',
+  'Walmart',
+  'Otro',
+]

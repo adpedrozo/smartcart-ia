@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getProducts, createProduct, deleteProduct, updateStock } from '../api'
-import { CATEGORIES } from '../constants'
+import { CATEGORIES, SUPERMARKETS } from '../constants'
+import { getPrices, createPrice } from '../api'
 
 function Inventory() {
   const [products, setProducts] = useState([])
@@ -13,6 +14,9 @@ function Inventory() {
     current_stock: 0,
     minimum_stock: 1,
   })
+  const [showPriceForm, setShowPriceForm] = useState(null) // product id
+  const [priceForm, setPriceForm] = useState({ supermarket: '', price: '' })
+  const [priceError, setPriceError] = useState(null)
 
   useEffect(() => {
     fetchProducts()
@@ -73,6 +77,26 @@ function Inventory() {
     if (current <= minimum * 0.5) return <span className="badge urgent">Urgente</span>
     if (current <= minimum) return <span className="badge low">Bajo</span>
     return <span className="badge ok">OK</span>
+  }
+
+  const handlePriceSubmit = async (productId) => {
+    setPriceError(null)
+    if (!priceForm.supermarket || !priceForm.price) {
+      setPriceError('Completa todos los campos.')
+      return
+    }
+    try {
+      await createPrice({
+        product_id: productId,
+        supermarket: priceForm.supermarket,
+        price: parseFloat(priceForm.price),
+      })
+      setShowPriceForm(null)
+      setPriceForm({ supermarket: '', price: '' })
+      fetchProducts()
+    } catch (err) {
+      console.error('Error creating price:', err)
+    }
   }
 
   if (loading) return <div className="loading">Cargando inventario...</div>
@@ -175,7 +199,47 @@ function Inventory() {
                 </div>
                 <div className="stock-min">min: {product.minimum_stock}</div>
               </div>
-              <button className="btn-delete" onClick={() => handleDelete(product.id)}>x</button>
+                <div className="price-actions">
+                  <button
+                    className="btn-price"
+                    onClick={() => {
+                      setShowPriceForm(showPriceForm === product.id ? null : product.id)
+                      setPriceError(null)
+                      setPriceForm({ supermarket: '', price: '' })
+                    }}
+                  >
+                    $ Precio
+                  </button>
+                  <button className="btn-delete" onClick={() => handleDelete(product.id)}>x</button>
+                </div>
+
+                {showPriceForm === product.id && (
+                  <div className="price-form">
+                    {priceError && <span className="price-error">{priceError}</span>}
+                    <select
+                      value={priceForm.supermarket}
+                      onChange={(e) => setPriceForm({ ...priceForm, supermarket: e.target.value })}
+                    >
+                      <option value="">Supermercado...</option>
+                      {SUPERMARKETS.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="number"
+                      placeholder="Precio"
+                      value={priceForm.price}
+                      onChange={(e) => setPriceForm({ ...priceForm, price: e.target.value })}
+                      min="0"
+                    />
+                    <button
+                      className="btn-primary"
+                      onClick={() => handlePriceSubmit(product.id)}
+                    >
+                      Guardar
+                    </button>
+                  </div>
+                )}
             </div>
           ))}
         </div>

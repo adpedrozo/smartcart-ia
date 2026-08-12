@@ -92,6 +92,7 @@ body {
 .page-header h1 {
   font-size: 24px;
   color: #4A9EDB;
+  text-align: left;
 }
 
 /* ===== BUTTONS ===== */
@@ -218,6 +219,8 @@ body {
 
 .product-info {
   flex: 1;
+  min-width: 0;
+  text-align: left;
 }
 
 .product-name {
@@ -453,4 +456,66 @@ body {
 .field-group select option {
   background-color: #1A2B3C;
   color: #E0E0E0;
+}
+
+/* ===== PRICE FORM ===== */
+.price-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-price {
+  background: none;
+  border: 1px solid #2E4057;
+  color: #8BADC7;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-price:hover {
+  background-color: #2E4057;
+  color: #ffffff;
+}
+
+.price-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: #131F2B;
+  border-top: 1px solid #2E4057;
+  flex-wrap: wrap;
+}
+
+.price-form select,
+.price-form input {
+  padding: 8px 12px;
+  border: 1px solid #2E4057;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+  background-color: #0F1923;
+  color: #E0E0E0;
+  transition: border-color 0.2s;
+}
+
+.price-form select:focus,
+.price-form input:focus {
+  border-color: #2E75B6;
+}
+
+.price-form input {
+  width: 120px;
+}
+
+.price-error {
+  font-size: 12px;
+  color: #FF6B6B;
+  width: 100%;
 }
