@@ -3,6 +3,7 @@ venv/
 
 # Credentials and ENV Vars
 .env
+credentials/
 
 # Python
 __pycache__/

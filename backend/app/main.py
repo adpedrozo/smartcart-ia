@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from . import models
@@ -125,3 +125,42 @@ def update_stock(product_id: int, stock: int, db: Session = Depends(get_db)):
 def price_alert(product_id: int, db: Session = Depends(get_db)):
     from .logic import check_price_alert
     return check_price_alert(db, product_id)
+
+@app.post("/tickets/scan")
+async def scan_ticket(file: UploadFile = File(...)):
+    """
+    Receives a ticket image, extracts text with Vision OCR
+    and parses products with Gemini.
+    """
+    from .ocr import process_ticket_image, parse_ticket_with_gemini
+
+    # Validate file type
+    if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid file type. Only JPEG, PNG and WebP are supported."
+        )
+
+    # Read image bytes
+    image_bytes = await file.read()
+
+    # Step 1: Extract text with Google Vision
+    ocr_result = process_ticket_image(image_bytes)
+    raw_text = ocr_result["raw_text"]
+
+    if not raw_text:
+        raise HTTPException(
+            status_code=422,
+            detail="Could not extract text from image. Try with a clearer photo."
+        )
+
+    # Step 2: Parse with Gemini
+    parsed = parse_ticket_with_gemini(raw_text)
+
+    return {
+        "raw_text": raw_text,
+        "supermarket": parsed.get("supermarket"),
+        "date": parsed.get("date"),
+        "items": parsed.get("items", []),
+        "total": parsed.get("total")
+    }
