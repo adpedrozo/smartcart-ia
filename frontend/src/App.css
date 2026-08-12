@@ -519,3 +519,79 @@ body {
   color: #FF6B6B;
   width: 100%;
 }
+
+/* ===== LIST ACTIONS ===== */
+.list-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-secondary {
+  background: none;
+  border: 1px solid #2E75B6;
+  color: #4A9EDB;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: #2E75B6;
+  color: #ffffff;
+}
+
+/* ===== LIST HEADER ===== */
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: #1A2B3C;
+  border-radius: 10px 10px 0 0;
+  border: 1px solid #2E4057;
+  border-bottom: none;
+  font-size: 13px;
+  color: #8BADC7;
+  font-weight: bold;
+}
+
+/* ===== LIST ACTIONS ===== */
+.list-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-secondary {
+  background: none;
+  border: 1px solid #2E75B6;
+  color: #4A9EDB;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: #2E75B6;
+  color: #ffffff;
+}
+
+/* ===== LIST HEADER ===== */
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: #1A2B3C;
+  border-radius: 10px 10px 0 0;
+  border: 1px solid #2E4057;
+  border-bottom: none;
+  font-size: 13px;
+  color: #8BADC7;
+  font-weight: bold;
+}
