@@ -25,7 +25,6 @@ app.add_middleware(
 class ProductCreate(BaseModel):
     name: str
     category: Optional[str] = None
-    unit: Optional[str] = None
     current_stock: Optional[int] = 0
     minimum_stock: Optional[int] = 1
 
@@ -46,7 +45,33 @@ def get_products(db: Session = Depends(get_db)):
 
 @app.post("/products")
 def create_product(product: ProductCreate, db: Session = Depends(get_db)):
-    db_product = models.Product(**product.model_dump())
+    # Validate category
+    if not product.category or product.category.strip() == "":
+        raise HTTPException(status_code=422, detail="Category is required")
+
+    # Normalize name - Title Case and trim
+    normalized_name = product.name.strip().title()
+
+    # Aggressive comparison - remove spaces and lowercase for duplicate check
+    def normalize_for_compare(name: str) -> str:
+        return name.lower().replace(" ", "").replace(".", "").replace("-", "")
+
+    normalized_compare = normalize_for_compare(normalized_name)
+
+    # Check all existing products
+    existing_products = db.query(models.Product).all()
+    for existing in existing_products:
+        if normalize_for_compare(existing.name) == normalized_compare:
+            raise HTTPException(
+                status_code=409,
+                detail=f"Similar product already exists: {existing.name}"
+            )
+
+    product_data = product.model_dump()
+    product_data["name"] = normalized_name
+    product_data["unit"] = "unidades"
+
+    db_product = models.Product(**product_data)
     db.add(db_product)
     db.commit()
     db.refresh(db_product)
