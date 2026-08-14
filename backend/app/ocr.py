@@ -2,10 +2,10 @@ import os
 import json
 from google.cloud import vision
 from google.oauth2 import service_account
-import google.generativeai as genai
+from google import genai
 
-# Configure Gemini
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+# Configure Gemini client
+gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 def get_vision_client():
     """
@@ -37,7 +37,7 @@ def process_ticket_image(image_bytes: bytes) -> dict:
 
     texts = response.text_annotations
     if not texts:
-        return {"raw_text": "", "lines": []}
+        return {"raw_text": ""}
 
     raw_text = texts[0].description
 
@@ -48,8 +48,6 @@ def parse_ticket_with_gemini(raw_text: str) -> dict:
     Uses Gemini to extract products and prices from raw OCR ticket text.
     Returns structured JSON with supermarket, date, items and total.
     """
-    model = genai.GenerativeModel("gemini-1.5-flash")
-
     prompt = f"""
 You are a receipt parser for Argentine supermarket tickets.
 Extract the products and prices from this ticket text.
@@ -58,10 +56,10 @@ Rules:
 - Ignore header info: store name, address, CUIT, phone, date, cashier, receipt numbers
 - Ignore barcodes (long sequences of numbers)
 - Ignore payment info: VISA, MASTERCARD, total, change, payments
-- Ignore discounts/bonifications lines
+- Ignore discounts and bonifications lines
 - Each product has a name and a price in Argentine pesos
 - Prices have format like 158.00 or 355,37
-- If a product name spans multiple lines, join them
+- If a product name spans multiple lines, join them into one
 - Return ONLY valid JSON, no explanation, no markdown
 
 Return this exact JSON structure:
@@ -79,7 +77,11 @@ Ticket text:
 {raw_text}
 """
 
-    response = model.generate_content(prompt)
+    response = gemini_client.models.generate_content(
+        model="gemini-3.5-flash",
+        contents=prompt
+    )
+
     text = response.text.strip()
 
     # Clean markdown if present
