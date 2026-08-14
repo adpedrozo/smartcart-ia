@@ -29,11 +29,11 @@ def get_shopping_list(db: Session) -> list:
         if status == "ok":
             continue  # No need to buy
 
-        # Get latest price for this product
+        # Get cheapest price for this product across all supermarkets
         latest_price = (
             db.query(models.Price)
             .filter(models.Price.product_id == product.id)
-            .order_by(models.Price.recorded_at.desc())
+            .order_by(models.Price.price.asc())
             .first()
         )
 

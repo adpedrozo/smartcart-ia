@@ -18,6 +18,7 @@ function Inventory() {
   const [showPriceForm, setShowPriceForm] = useState(null) // product id
   const [priceForm, setPriceForm] = useState({ supermarket: '', price: '' })
   const [priceError, setPriceError] = useState(null)
+  const [pendingStock, setPendingStock] = useState({}) // {product_id: newStock}
 
   useEffect(() => {
     fetchProducts()
@@ -26,7 +27,17 @@ function Inventory() {
   const fetchProducts = async () => {
     try {
       const res = await getProducts()
-      setProducts(res.data)
+      const priorityOrder = { critical: 0, urgent: 1, low: 2, ok: 3 }
+      const sorted = res.data.sort((a, b) => {
+        const getStatus = (p) => {
+          if (p.current_stock <= 0) return 'critical'
+          if (p.current_stock <= p.minimum_stock * 0.5) return 'urgent'
+          if (p.current_stock <= p.minimum_stock) return 'low'
+          return 'ok'
+        }
+        return priorityOrder[getStatus(a)] - priorityOrder[getStatus(b)]
+      })
+      setProducts(sorted)
     } catch (err) {
       console.error('Error fetching products:', err)
     } finally {
@@ -63,10 +74,20 @@ function Inventory() {
     }
   }
 
-  const handleStockChange = async (id, newStock) => {
+  const handleStockChange = (id, newStock) => {
     if (newStock < 0) return
+    setShowPriceForm(null)  // close price form if still open
+    setPendingStock(prev => ({ ...prev, [id]: newStock }))
+  }
+
+  const handleStockSave = async (id) => {
     try {
-      await updateStock(id, newStock)
+      await updateStock(id, pendingStock[id])
+      setPendingStock(prev => {
+        const updated = { ...prev }
+        delete updated[id]
+        return updated
+      })
       fetchProducts()
     } catch (err) {
       console.error('Error updating stock:', err)
@@ -187,36 +208,75 @@ function Inventory() {
           {products.map((product) => (
             <div key={product.id} className="product-card">
               <div className="product-info">
-                <div className="product-name">{product.name}</div>
-                <div className="product-meta">
-                  {product.category && <span>{product.category}</span>}
-                </div>
+                <div className="product-name" title={product.name}>{product.name}</div>
+                {showPriceForm !== product.id && (
+                  <div className="product-meta">
+                    {product.category && <span>{product.category}</span>}
+                  </div>
+                )}
               </div>
               <div className="product-stock">
-                {getStatusBadge(product.current_stock, product.minimum_stock)}
+                {getStatusBadge(
+                  pendingStock[product.id] !== undefined ? pendingStock[product.id] : product.current_stock,
+                  product.minimum_stock
+                )}
                 <div className="stock-controls">
-                  <button onClick={() => handleStockChange(product.id, product.current_stock - 1)}>-</button>
-                  <span>{product.current_stock}</span>
-                  <button onClick={() => handleStockChange(product.id, product.current_stock + 1)}>+</button>
+                  <button onClick={() => handleStockChange(
+                    product.id,
+                    (pendingStock[product.id] !== undefined ? pendingStock[product.id] : product.current_stock) - 1
+                  )}>-</button>
+                  <span>
+                    {pendingStock[product.id] !== undefined ? pendingStock[product.id] : product.current_stock}
+                  </span>
+                  <button onClick={() => handleStockChange(
+                    product.id,
+                    (pendingStock[product.id] !== undefined ? pendingStock[product.id] : product.current_stock) + 1
+                  )}>+</button>
                 </div>
                 <div className="stock-min">min: {product.minimum_stock}</div>
+                {pendingStock[product.id] !== undefined && (
+                  <>
+                    <button
+                      className="btn-stock-save"
+                      onClick={() => handleStockSave(product.id)}
+                    >
+                      Guardar
+                    </button>
+                    <button
+                      className="btn-cancel"
+                      onClick={() => setPendingStock(prev => {
+                        const updated = { ...prev }
+                        delete updated[product.id]
+                        return updated
+                      })}
+                    >
+                      Cancelar
+                    </button>
+                  </>
+                )}
               </div>
                 <div className="price-actions">
                   <button
-                    className="btn-price"
+                    className={`btn-price ${showPriceForm === product.id ? 'active' : ''}`}
                     onClick={() => {
                       setShowPriceForm(showPriceForm === product.id ? null : product.id)
                       setPriceError(null)
                       setPriceForm({ supermarket: '', price: '' })
+                      setPendingStock(prev => {
+                        const updated = { ...prev }
+                        delete updated[product.id]
+                        return updated
+                      })
                     }}
                   >
-                    $ Precio
+                    {showPriceForm === product.id ? 'Cancelar' : '$ Precio'}
                   </button>
                   <button className="btn-delete" onClick={() => handleDelete(product.id)}>x</button>
                 </div>
 
                 {showPriceForm === product.id && (
                   <div className="price-form">
+                    <span className="price-form-name">{product.name}</span>
                     {priceError && <span className="price-error">{priceError}</span>}
                     <select
                       value={priceForm.supermarket}

@@ -77,6 +77,29 @@ def create_product(product: ProductCreate, db: Session = Depends(get_db)):
     db.refresh(db_product)
     return db_product
 
+@app.get("/products/with-prices")
+def get_products_with_prices(db: Session = Depends(get_db)):
+    products = db.query(models.Product).all()
+    result = []
+    for product in products:
+        cheapest_price = (
+            db.query(models.Price)
+            .filter(models.Price.product_id == product.id)
+            .order_by(models.Price.price.asc())
+            .first()
+        )
+        result.append({
+            "id": product.id,
+            "name": product.name,
+            "category": product.category,
+            "current_stock": product.current_stock,
+            "minimum_stock": product.minimum_stock,
+            "created_at": product.created_at,
+            "latest_price": cheapest_price.price if cheapest_price else None,
+            "supermarket": cheapest_price.supermarket if cheapest_price else None,
+        })
+    return result
+
 @app.get("/products/{product_id}")
 def get_product(product_id: int, db: Session = Depends(get_db)):
     product = db.query(models.Product).filter(models.Product.id == product_id).first()
@@ -89,6 +112,8 @@ def delete_product(product_id: int, db: Session = Depends(get_db)):
     product = db.query(models.Product).filter(models.Product.id == product_id).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
+    # Delete associated prices first
+    db.query(models.Price).filter(models.Price.product_id == product_id).delete()
     db.delete(product)
     db.commit()
     return {"message": "Product deleted"}
@@ -100,6 +125,21 @@ def get_prices(product_id: int, db: Session = Depends(get_db)):
 
 @app.post("/prices")
 def create_price(price: PriceCreate, db: Session = Depends(get_db)):
+    # Check if price already exists for this product and supermarket
+    existing = db.query(models.Price).filter(
+        models.Price.product_id == price.product_id,
+        models.Price.supermarket == price.supermarket
+    ).first()
+
+    if existing:
+        # Update existing price
+        existing.price = price.price
+        existing.recorded_at = None  # Will be set by server default on update
+        db.commit()
+        db.refresh(existing)
+        return existing
+
+    # Create new price
     db_price = models.Price(**price.model_dump())
     db.add(db_price)
     db.commit()
