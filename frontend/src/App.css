@@ -228,6 +228,10 @@ body {
   font-weight: bold;
   color: #E0E0E0;
   margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 340px;
 }
 
 .product-meta {
@@ -690,11 +694,15 @@ body {
   justify-content: space-between;
   flex: 1;
   gap: 12px;
+  min-width: 0;
 }
 
 .scanner-item-name {
   font-size: 13px;
   color: #E0E0E0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .scanner-item-price {
@@ -715,4 +723,94 @@ body {
 .scanner-count {
   font-size: 12px;
   color: #556677;
+}
+
+/* ===== SCANNER OVERLAY ===== */
+.scanner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.scanner-overlay-box {
+  background: #1A2B3C;
+  border: 1px solid #2E4057;
+  border-radius: 12px;
+  padding: 40px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.scanner-overlay-box p {
+  font-size: 18px;
+  font-weight: bold;
+  color: #E0E0E0;
+}
+
+.scanner-overlay-box span {
+  font-size: 13px;
+  color: #556677;
+}
+
+.scanner-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #2E4057;
+  border-top-color: #4A9EDB;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.scanner-item-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.scanner-item-category {
+  font-size: 11px;
+  color: #556677;
+}
+
+.btn-primary:disabled {
+  background-color: #2E4057;
+  color: #556677;
+  cursor: not-allowed;
+}
+
+.scanner-actions-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-cancel {
+  background: none;
+  border: 1px solid #556677;
+  color: #556677;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+  border-color: #E24B4A;
+  color: #E24B4A;
 }

@@ -62,13 +62,15 @@ Rules:
 - If a product name spans multiple lines, join them into one
 - Return ONLY valid JSON, no explanation, no markdown
 
+The available categories are: Almacén, Lácteos, Carnes, Frutas y Verduras, Limpieza, Higiene Personal, Bebidas, Congelados, Panadería, Otros.
+
 Return this exact JSON structure:
 {{
   "supermarket": "store name or null",
   "date": "date found or null",
   "items": [
-    {{"name": "product name", "price": 0.00}},
-    {{"name": "product name", "price": 0.00}}
+    {{"name": "product name", "price": 0.00, "category": "category from the list above"}},
+    {{"name": "product name", "price": 0.00, "category": "category from the list above"}}
   ],
   "total": 0.00
 }}

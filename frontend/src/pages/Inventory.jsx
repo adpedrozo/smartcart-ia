@@ -190,7 +190,6 @@ function Inventory() {
                 <div className="product-name">{product.name}</div>
                 <div className="product-meta">
                   {product.category && <span>{product.category}</span>}
-                  <span>unidades</span>
                 </div>
               </div>
               <div className="product-stock">
