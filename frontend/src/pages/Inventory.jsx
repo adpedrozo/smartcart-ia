@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getProducts, createProduct, deleteProduct, updateStock } from '../api'
 import { CATEGORIES, SUPERMARKETS } from '../constants'
 import { getPrices, createPrice } from '../api'
+import TicketScanner from '../components/TicketScanner'
 
 function Inventory() {
   const [products, setProducts] = useState([])
@@ -109,7 +110,9 @@ function Inventory() {
           {showForm ? 'Cancelar' : '+ Agregar producto'}
         </button>
       </div>
-
+      
+      <TicketScanner onProductsAdded={fetchProducts} />
+      
       {showForm && (
         <form className="product-form" onSubmit={handleSubmit}>
           <h3>Nuevo Producto</h3>

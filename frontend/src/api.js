@@ -19,3 +19,8 @@ export const getPriceAlert = (productId) => api.get(`/prices/${productId}/alert`
 
 // Shopping list
 export const getShoppingList = () => api.get('/shopping-list')
+
+// Tickets
+export const scanTicket = (formData) => api.post('/tickets/scan', formData, {
+  headers: { 'Content-Type': 'multipart/form-data' }
+})
