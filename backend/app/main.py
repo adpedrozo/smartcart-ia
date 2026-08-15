@@ -140,21 +140,6 @@ def get_prices(product_id: int, db: Session = Depends(get_db)):
 
 @app.post("/prices")
 def create_price(price: PriceCreate, db: Session = Depends(get_db)):
-    # Check if price already exists for this product and supermarket
-    existing = db.query(models.Price).filter(
-        models.Price.product_id == price.product_id,
-        models.Price.supermarket == price.supermarket
-    ).first()
-
-    if existing:
-        existing.price = price.price
-        from sqlalchemy.sql import func
-        existing.recorded_at = func.now()
-        db.commit()
-        db.refresh(existing)
-        return existing
-
-    # Create new price
     db_price = models.Price(**price.model_dump())
     db.add(db_price)
     db.commit()
@@ -217,4 +202,63 @@ async def scan_ticket(file: UploadFile = File(...)):
         "date": parsed.get("date"),
         "items": parsed.get("items", []),
         "total": parsed.get("total")
+    }
+
+@app.post("/tickets/analyze")
+async def analyze_ticket(file: UploadFile = File(...)):
+    """
+    Full agent pipeline:
+    1. OCR with Google Vision
+    2. Parse with Gemini
+    3. Analyze products against inventory and price history
+    """
+    from .ocr import process_ticket_image, parse_ticket_with_gemini
+    from .agent import analyze_ticket_products
+
+    if file.content_type not in ["image/jpeg", "image/png", "image/webp"]:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid file type. Only JPEG, PNG and WebP are supported."
+        )
+
+    image_bytes = await file.read()
+
+    # Step 1: OCR
+    ocr_result = process_ticket_image(image_bytes)
+    raw_text = ocr_result["raw_text"]
+
+    if not raw_text:
+        raise HTTPException(
+            status_code=422,
+            detail="Could not extract text from image. Try with a clearer photo."
+        )
+
+    # Step 2: Parse with Gemini
+    try:
+        parsed = parse_ticket_with_gemini(raw_text)
+    except Exception as e:
+        error_msg = str(e)
+        if '503' in error_msg or 'UNAVAILABLE' in error_msg or 'high demand' in error_msg:
+            raise HTTPException(status_code=503, detail="El servicio de IA está temporalmente ocupado. Intenta de nuevo en unos segundos.")
+        raise HTTPException(status_code=422, detail="No se pudo leer el ticket. Asegurate de que la foto sea clara.")
+
+    # Step 3: Agent analysis
+    from .database import SessionLocal
+    db = SessionLocal()
+    try:
+        analysis = analyze_ticket_products(parsed.get("items", []), db)
+    except Exception as e:
+        db.close()
+        raise HTTPException(status_code=422, detail=str(e))
+    finally:
+        db.close()
+
+    return {
+        "supermarket": parsed.get("supermarket"),
+        "date": parsed.get("date"),
+        "total": parsed.get("total"),
+        "raw_text": raw_text,
+        "items": analysis["items"],
+        "alerts": analysis["alerts"],
+        "suggestions": analysis["suggestions"],
     }

@@ -93,4 +93,7 @@ Ticket text:
             text = text[4:]
         text = text.strip()
 
-    return json.loads(text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        raise Exception("Could not parse ticket content. Image may be unclear or not a valid ticket.")

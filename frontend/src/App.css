@@ -975,6 +975,161 @@ body {
   color: #E24B4A;
 }
 
+/* ===== SCANNER ALERTS ===== */
+.scanner-alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scanner-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.scanner-alert.up {
+  background-color: #3D1A1A;
+  border: 1px solid #E24B4A;
+}
+
+.scanner-alert.down {
+  background-color: #1A2D1A;
+  border: 1px solid #639922;
+}
+
+.alert-arrow {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.scanner-alert.up .alert-arrow {
+  color: #FF6B6B;
+}
+
+.scanner-alert.down .alert-arrow {
+  color: #6DBF67;
+}
+
+.alert-text {
+  color: #E0E0E0;
+}
+
+/* ===== SCANNER SUGGESTIONS ===== */
+.scanner-suggestions {
+  background-color: #1A2B3C;
+  border: 1px solid #2E75B6;
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scanner-suggestions-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: #4A9EDB;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.scanner-suggestion-item {
+  font-size: 13px;
+  color: #E0E0E0;
+  line-height: 1.5;
+}
+
+/* ===== SCANNER ITEM META ===== */
+.scanner-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.scanner-item-exists {
+  font-size: 10px;
+  color: #4A9EDB;
+  background-color: #1A2B3C;
+  border: 1px solid #2E4057;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+.scanner-item-change {
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.scanner-item-change.up {
+  color: #FF6B6B;
+}
+
+.scanner-item-change.down {
+  color: #6DBF67;
+}
+
+/* ===== SCANNER ITEM QTY ===== */
+.scanner-item-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+  min-width: 0;
+}
+
+.scanner-item-qty {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 6px;
+  border-top: 1px solid #2E4057;
+}
+
+.scanner-item-qty-label {
+  font-size: 11px;
+  color: #556677;
+}
+
+.scanner-qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scanner-qty-controls button {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid #2E4057;
+  background: #0F1923;
+  color: #E0E0E0;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.scanner-qty-controls button:hover {
+  background-color: #2E75B6;
+  color: #ffffff;
+  border-color: #2E75B6;
+}
+
+.scanner-qty-controls span {
+  font-size: 15px;
+  font-weight: bold;
+  min-width: 20px;
+  text-align: center;
+  color: #E0E0E0;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
