@@ -77,6 +77,16 @@ def create_product(product: ProductCreate, db: Session = Depends(get_db)):
     db.refresh(db_product)
     return db_product
 
+@app.patch("/products/{product_id}/stock")
+def update_stock(product_id: int, stock: int, db: Session = Depends(get_db)):
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    product.current_stock = stock
+    db.commit()
+    db.refresh(product)
+    return product
+
 @app.get("/products/with-prices")
 def get_products_with_prices(db: Session = Depends(get_db)):
     products = db.query(models.Product).all()
@@ -120,7 +130,12 @@ def delete_product(product_id: int, db: Session = Depends(get_db)):
 
 @app.get("/prices/{product_id}")
 def get_prices(product_id: int, db: Session = Depends(get_db)):
-    prices = db.query(models.Price).filter(models.Price.product_id == product_id).all()
+    prices = (
+        db.query(models.Price)
+        .filter(models.Price.product_id == product_id)
+        .order_by(models.Price.recorded_at.desc())
+        .all()
+    )
     return prices
 
 @app.post("/prices")
@@ -146,25 +161,24 @@ def create_price(price: PriceCreate, db: Session = Depends(get_db)):
     db.refresh(db_price)
     return db_price
 
-@app.get("/shopping-list")
-def get_shopping_list(db: Session = Depends(get_db)):
-    from .logic import get_shopping_list
-    return get_shopping_list(db)
-
-@app.patch("/products/{product_id}/stock")
-def update_stock(product_id: int, stock: int, db: Session = Depends(get_db)):
-    product = db.query(models.Product).filter(models.Product.id == product_id).first()
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    product.current_stock = stock
+@app.delete("/prices/{price_id}")
+def delete_price(price_id: int, db: Session = Depends(get_db)):
+    price = db.query(models.Price).filter(models.Price.id == price_id).first()
+    if not price:
+        raise HTTPException(status_code=404, detail="Price not found")
+    db.delete(price)
     db.commit()
-    db.refresh(product)
-    return product
+    return {"message": "Price deleted"}
 
 @app.get("/prices/{product_id}/alert")
 def price_alert(product_id: int, db: Session = Depends(get_db)):
     from .logic import check_price_alert
     return check_price_alert(db, product_id)
+
+@app.get("/shopping-list")
+def get_shopping_list(db: Session = Depends(get_db)):
+    from .logic import get_shopping_list
+    return get_shopping_list(db)
 
 @app.post("/tickets/scan")
 async def scan_ticket(file: UploadFile = File(...)):

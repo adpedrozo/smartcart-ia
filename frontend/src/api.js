@@ -17,6 +17,7 @@ export const getProductsWithPrices = () => api.get('/products/with-prices')
 export const getPrices = (productId) => api.get(`/prices/${productId}`)
 export const createPrice = (price) => api.post('/prices', price)
 export const getPriceAlert = (productId) => api.get(`/prices/${productId}/alert`)
+export const deletePrice = (priceId) => api.delete(`/prices/${priceId}`)
 
 // Shopping list
 export const getShoppingList = () => api.get('/shopping-list')

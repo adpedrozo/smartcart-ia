@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
-import { getProducts, createProduct, deleteProduct, updateStock } from '../api'
+import { getProducts, createProduct, deleteProduct, updateStock, getPrices, createPrice, deletePrice } from '../api'
 import { CATEGORIES, SUPERMARKETS } from '../constants'
-import { getPrices, createPrice } from '../api'
 import TicketScanner from '../components/TicketScanner'
 
 function Inventory() {
@@ -105,7 +104,7 @@ function Inventory() {
 
   const handlePriceSubmit = async (productId) => {
     setPriceError(null)
-    if (!priceForm.supermarket || !priceForm.price) {
+    if (!priceForm.supermarket || !priceForm.price || parseFloat(priceForm.price) <= 0) {
       setPriceError('Completa todos los campos.')
       return
     }
@@ -151,6 +150,17 @@ function Inventory() {
       delete updated[productId]
       return updated
     })
+  }
+
+  const handleDeletePrice = async (priceId, productId) => {
+    if (!window.confirm('Eliminar este precio del historial?')) return
+    try {
+      await deletePrice(priceId)
+      const res = await getPrices(productId)
+      setPriceHistory(res.data)
+    } catch (err) {
+      console.error('Error deleting price:', err)
+    }
   }
 
   if (loading) return <div className="loading">Cargando inventario...</div>
@@ -320,7 +330,7 @@ function Inventory() {
               {showPriceForm === product.id && (
                 <div className="price-form-container">
                   <div className="price-form">
-                    <span className="price-form-name">{product.name}</span>
+                    
                     {priceError && <span className="price-error">{priceError}</span>}
                     <select
                       value={priceForm.supermarket}
@@ -363,6 +373,7 @@ function Inventory() {
                               <th>Supermercado</th>
                               <th>Precio</th>
                               <th>Fecha</th>
+                              <th>Eliminar</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -371,6 +382,14 @@ function Inventory() {
                                 <td>{p.supermarket}</td>
                                 <td>${p.price}</td>
                                 <td>{new Date(p.recorded_at).toLocaleDateString('es-AR')}</td>
+                                <td>
+                                  <button
+                                    className="btn-delete-price"
+                                    onClick={() => handleDeletePrice(p.id, product.id)}
+                                  >
+                                    x
+                                  </button>
+                                </td>
                               </tr>
                             ))}
                           </tbody>

@@ -960,6 +960,21 @@ body {
   overflow: hidden;
 }
 
+.btn-delete-price {
+  background: none;
+  border: none;
+  color: #556677;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.btn-delete-price:hover {
+  color: #E24B4A;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
