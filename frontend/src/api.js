@@ -12,6 +12,7 @@ export const createProduct = (product) => api.post('/products', product)
 export const deleteProduct = (id) => api.delete(`/products/${id}`)
 export const updateStock = (id, stock) => api.patch(`/products/${id}/stock`, null, { params: { stock } })
 export const getProductsWithPrices = () => api.get('/products/with-prices')
+export const updateProductName = (id, name) => api.patch(`/products/${id}/name`, null, { params: { name } })
 
 // Prices
 export const getPrices = (productId) => api.get(`/prices/${productId}`)

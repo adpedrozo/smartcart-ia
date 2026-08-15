@@ -87,6 +87,20 @@ def update_stock(product_id: int, stock: int, db: Session = Depends(get_db)):
     db.refresh(product)
     return product
 
+@app.patch("/products/{product_id}/name")
+def update_product_name(product_id: int, name: str, db: Session = Depends(get_db)):
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    # Normalize name
+    normalized_name = name.strip().title()
+    
+    product.name = normalized_name
+    db.commit()
+    db.refresh(product)
+    return product
+
 @app.get("/products/with-prices")
 def get_products_with_prices(db: Session = Depends(get_db)):
     products = db.query(models.Product).all()

@@ -1130,6 +1130,58 @@ body {
   color: #E0E0E0;
 }
 
+/* ===== INLINE NAME EDIT ===== */
+.product-name-edit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.product-name-input {
+  font-size: 14px;
+  font-weight: bold;
+  color: #E0E0E0;
+  background-color: #0F1923;
+  border: 1px solid #2E75B6;
+  border-radius: 6px;
+  padding: 4px 8px;
+  outline: none;
+  width: 100%;
+  max-width: 280px;
+}
+
+.btn-name-save {
+  background: none;
+  border: 1px solid #639922;
+  color: #6DBF67;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.btn-name-save:hover {
+  background-color: #639922;
+  color: #ffffff;
+}
+
+.btn-name-cancel {
+  background: none;
+  border: 1px solid #556677;
+  color: #556677;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.btn-name-cancel:hover {
+  border-color: #E24B4A;
+  color: #E24B4A;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
