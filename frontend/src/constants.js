@@ -12,13 +12,20 @@ export const CATEGORIES = [
 ]
 
 export const SUPERMARKETS = [
-  'Coto',
   'Carrefour',
   'Changomás',
+  'Coto',
   'Dia',
   'Disco',
-  'La Anonima',
+  'Diarco',
   'Jumbo',
+  'La Anónima',
+  'Libertad',
+  'Makro',
+  'Norte',
+  'Tadicor',
+  'Toledo',
+  'Vea',
   'Walmart',
   'Otro',
 ]

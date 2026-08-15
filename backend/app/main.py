@@ -132,9 +132,9 @@ def create_price(price: PriceCreate, db: Session = Depends(get_db)):
     ).first()
 
     if existing:
-        # Update existing price
         existing.price = price.price
-        existing.recorded_at = None  # Will be set by server default on update
+        from sqlalchemy.sql import func
+        existing.recorded_at = func.now()
         db.commit()
         db.refresh(existing)
         return existing

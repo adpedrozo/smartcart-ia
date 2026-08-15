@@ -50,8 +50,31 @@ function TicketScanner({ onProductsAdded }) {
     const normalizeSuper = (name) => {
       if (!name) return 'Otro'
       const upper = name.toUpperCase()
-      const match = SUPERMARKETS.find(s => upper.includes(s.toUpperCase()))
-      return match || 'Otro'
+      const mapping = {
+        'CARREFOUR': 'Carrefour',
+        'CHANGOMAS': 'Changomás',
+        'CHANGO MAS': 'Changomás',
+        'HIPERCHANGOMAS': 'Changomás',
+        'COTO': 'Coto',
+        'DIA': 'Dia',
+        'DISCO': 'Disco',
+        'DIARCO': 'Diarco',
+        'JUMBO': 'Jumbo',
+        'LA ANONIMA': 'La Anónima',
+        'ANONIMA': 'La Anónima',
+        'LIBERTAD': 'Libertad',
+        'MAKRO': 'Makro',
+        'NORTE': 'Norte',
+        'TADICOR': 'Tadicor',
+        'TOLEDO': 'Toledo',
+        'VEA': 'Vea',
+        'WALMART': 'Walmart',
+        'WAL MART': 'Walmart'
+      }
+      for (const [key, value] of Object.entries(mapping)) {
+        if (upper.includes(key)) return value
+      }
+      return 'Otro'
     }
 
     const supermarket = normalizeSuper(result.supermarket)

@@ -15,10 +15,12 @@ function Inventory() {
     current_stock: 0,
     minimum_stock: 1,
   })
-  const [showPriceForm, setShowPriceForm] = useState(null) // product id
+  const [showPriceForm, setShowPriceForm] = useState(null)
   const [priceForm, setPriceForm] = useState({ supermarket: '', price: '' })
   const [priceError, setPriceError] = useState(null)
-  const [pendingStock, setPendingStock] = useState({}) // {product_id: newStock}
+  const [pendingStock, setPendingStock] = useState({})
+  const [showPriceHistory, setShowPriceHistory] = useState(null)
+  const [priceHistory, setPriceHistory] = useState([])
 
   useEffect(() => {
     fetchProducts()
@@ -76,7 +78,7 @@ function Inventory() {
 
   const handleStockChange = (id, newStock) => {
     if (newStock < 0) return
-    setShowPriceForm(null)  // close price form if still open
+    setShowPriceForm(null)
     setPendingStock(prev => ({ ...prev, [id]: newStock }))
   }
 
@@ -114,11 +116,41 @@ function Inventory() {
         price: parseFloat(priceForm.price),
       })
       setShowPriceForm(null)
+      setShowPriceHistory(null)
+      setPriceHistory([])
       setPriceForm({ supermarket: '', price: '' })
       fetchProducts()
     } catch (err) {
       console.error('Error creating price:', err)
     }
+  }
+
+  const handleToggleHistory = async (productId) => {
+    if (showPriceHistory === productId) {
+      setShowPriceHistory(null)
+      setPriceHistory([])
+      return
+    }
+    try {
+      const res = await getPrices(productId)
+      setPriceHistory(res.data)
+      setShowPriceHistory(productId)
+    } catch (err) {
+      console.error('Error fetching price history:', err)
+    }
+  }
+
+  const closePriceForm = (productId) => {
+    setShowPriceForm(null)
+    setPriceError(null)
+    setPriceForm({ supermarket: '', price: '' })
+    setShowPriceHistory(null)
+    setPriceHistory([])
+    setPendingStock(prev => {
+      const updated = { ...prev }
+      delete updated[productId]
+      return updated
+    })
   }
 
   if (loading) return <div className="loading">Cargando inventario...</div>
@@ -131,28 +163,26 @@ function Inventory() {
           {showForm ? 'Cancelar' : '+ Agregar producto'}
         </button>
       </div>
-      
+
       <TicketScanner onProductsAdded={fetchProducts} />
-      
+
       {showForm && (
         <form className="product-form" onSubmit={handleSubmit}>
           <h3>Nuevo Producto</h3>
-
-            {similarWarning && (
+          {similarWarning && (
             <div className="warning-box">
-                <strong>Atención.</strong>{' '}
-                {similarWarning.includes('Similar product already exists:')
+              <strong>Atención.</strong>{' '}
+              {similarWarning.includes('Similar product already exists:')
                 ? `Ya existe un producto similar: ${similarWarning.replace('Similar product already exists: ', '')}`
                 : similarWarning}
-                {similarWarning.includes('Similar product already exists:') && (
+              {similarWarning.includes('Similar product already exists:') && (
                 <>
-                    <br />
-                    <span>Revisa el inventario antes de agregar uno nuevo.</span>
+                  <br />
+                  <span>Revisa el inventario antes de agregar uno nuevo.</span>
                 </>
-                )}
+              )}
             </div>
-            )}
-
+          )}
           <div className="form-grid">
             <div className="field-group full-width">
               <label>Nombre del Producto</label>
@@ -164,16 +194,16 @@ function Inventory() {
               />
             </div>
             <div className="field-group full-width">
-            <label>Categoría</label>
-            <select
+              <label>Categoría</label>
+              <select
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
-            >
+              >
                 <option value="">Seleccionar categoria...</option>
                 {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
+                  <option key={cat} value={cat}>{cat}</option>
                 ))}
-            </select>
+              </select>
             </div>
             <div className="field-group">
               <label>Stock actual (unidades)</label>
@@ -206,75 +236,89 @@ function Inventory() {
       ) : (
         <div className="product-list">
           {products.map((product) => (
-            <div key={product.id} className="product-card">
-              <div className="product-info">
-                <div className="product-name" title={product.name}>{product.name}</div>
-                {showPriceForm !== product.id && (
-                  <div className="product-meta">
-                    {product.category && <span>{product.category}</span>}
-                  </div>
-                )}
-              </div>
-              <div className="product-stock">
-                {getStatusBadge(
-                  pendingStock[product.id] !== undefined ? pendingStock[product.id] : product.current_stock,
-                  product.minimum_stock
-                )}
-                <div className="stock-controls">
-                  <button onClick={() => handleStockChange(
-                    product.id,
-                    (pendingStock[product.id] !== undefined ? pendingStock[product.id] : product.current_stock) - 1
-                  )}>-</button>
-                  <span>
-                    {pendingStock[product.id] !== undefined ? pendingStock[product.id] : product.current_stock}
-                  </span>
-                  <button onClick={() => handleStockChange(
-                    product.id,
-                    (pendingStock[product.id] !== undefined ? pendingStock[product.id] : product.current_stock) + 1
-                  )}>+</button>
+            <div key={product.id} className="product-card-wrapper">
+
+              {/* Fila principal */}
+              <div className="product-card">
+                <div className="product-info">
+                  <div className="product-name" title={product.name}>{product.name}</div>
+                  {showPriceForm !== product.id && (
+                    <div className="product-meta">
+                      {product.category && <span>{product.category}</span>}
+                    </div>
+                  )}
                 </div>
-                <div className="stock-min">min: {product.minimum_stock}</div>
-                {pendingStock[product.id] !== undefined && (
-                  <>
+
+                <div className="product-stock">
+                  {getStatusBadge(
+                    pendingStock[product.id] !== undefined ? pendingStock[product.id] : product.current_stock,
+                    product.minimum_stock
+                  )}
+                  <div className="stock-controls">
+                    <button onClick={() => handleStockChange(
+                      product.id,
+                      (pendingStock[product.id] !== undefined ? pendingStock[product.id] : product.current_stock) - 1
+                    )}>-</button>
+                    <span>
+                      {pendingStock[product.id] !== undefined ? pendingStock[product.id] : product.current_stock}
+                    </span>
+                    <button onClick={() => handleStockChange(
+                      product.id,
+                      (pendingStock[product.id] !== undefined ? pendingStock[product.id] : product.current_stock) + 1
+                    )}>+</button>
+                  </div>
+                  <div className="stock-min">min: {product.minimum_stock}</div>
+                  {pendingStock[product.id] !== undefined && (
+                    <>
+                      <button className="btn-stock-save" onClick={() => handleStockSave(product.id)}>
+                        Guardar
+                      </button>
+                      <button
+                        className="btn-cancel"
+                        onClick={() => setPendingStock(prev => {
+                          const updated = { ...prev }
+                          delete updated[product.id]
+                          return updated
+                        })}
+                      >
+                        Cancelar
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                <div className="price-actions">
+                  {showPriceForm !== product.id ? (
                     <button
-                      className="btn-stock-save"
-                      onClick={() => handleStockSave(product.id)}
+                      className="btn-price"
+                      onClick={() => {
+                        setShowPriceForm(product.id)
+                        setPriceError(null)
+                        setPriceForm({ supermarket: '', price: '' })
+                        setPendingStock(prev => {
+                          const updated = { ...prev }
+                          delete updated[product.id]
+                          return updated
+                        })
+                      }}
                     >
-                      Guardar
+                      $ Precio
                     </button>
+                  ) : (
                     <button
                       className="btn-cancel"
-                      onClick={() => setPendingStock(prev => {
-                        const updated = { ...prev }
-                        delete updated[product.id]
-                        return updated
-                      })}
+                      onClick={() => closePriceForm(product.id)}
                     >
                       Cancelar
                     </button>
-                  </>
-                )}
-              </div>
-                <div className="price-actions">
-                  <button
-                    className={`btn-price ${showPriceForm === product.id ? 'active' : ''}`}
-                    onClick={() => {
-                      setShowPriceForm(showPriceForm === product.id ? null : product.id)
-                      setPriceError(null)
-                      setPriceForm({ supermarket: '', price: '' })
-                      setPendingStock(prev => {
-                        const updated = { ...prev }
-                        delete updated[product.id]
-                        return updated
-                      })
-                    }}
-                  >
-                    {showPriceForm === product.id ? 'Cancelar' : '$ Precio'}
-                  </button>
+                  )}
                   <button className="btn-delete" onClick={() => handleDelete(product.id)}>x</button>
                 </div>
+              </div>
 
-                {showPriceForm === product.id && (
+              {/* Panel de precio — debajo de la fila principal */}
+              {showPriceForm === product.id && (
+                <div className="price-form-container">
                   <div className="price-form">
                     <span className="price-form-name">{product.name}</span>
                     {priceError && <span className="price-error">{priceError}</span>}
@@ -294,14 +338,49 @@ function Inventory() {
                       onChange={(e) => setPriceForm({ ...priceForm, price: e.target.value })}
                       min="0"
                     />
-                    <button
-                      className="btn-primary"
-                      onClick={() => handlePriceSubmit(product.id)}
-                    >
+                    <button className="btn-primary" onClick={() => handlePriceSubmit(product.id)}>
                       Guardar
                     </button>
                   </div>
-                )}
+
+                  <div className="price-history-toggle">
+                    <button
+                      className="btn-history"
+                      onClick={() => handleToggleHistory(product.id)}
+                    >
+                      {showPriceHistory === product.id ? 'Ocultar historial' : 'Ver historial'}
+                    </button>
+                  </div>
+
+                  {showPriceHistory === product.id && (
+                    <div className="price-history">
+                      {priceHistory.length === 0 ? (
+                        <p className="price-history-empty">Sin historial de precios.</p>
+                      ) : (
+                        <table className="price-history-table">
+                          <thead>
+                            <tr>
+                              <th>Supermercado</th>
+                              <th>Precio</th>
+                              <th>Fecha</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {priceHistory.map((p) => (
+                              <tr key={p.id}>
+                                <td>{p.supermarket}</td>
+                                <td>${p.price}</td>
+                                <td>{new Date(p.recorded_at).toLocaleDateString('es-AR')}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
             </div>
           ))}
         </div>
