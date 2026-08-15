@@ -107,7 +107,7 @@ function Inventory() {
   const handlePriceSubmit = async (productId) => {
     setPriceError(null)
     if (!priceForm.supermarket || !priceForm.price || parseFloat(priceForm.price) <= 0) {
-      setPriceError('Completa todos los campos con valores validos.')
+      setPriceError('Completa todos los campos con valores válidos.')
       return
     }
     try {
@@ -408,7 +408,7 @@ function Inventory() {
                               <th>Supermercado</th>
                               <th>Precio</th>
                               <th>Fecha</th>
-                              <th></th>
+                              <th>Eliminar</th>
                             </tr>
                           </thead>
                           <tbody>
