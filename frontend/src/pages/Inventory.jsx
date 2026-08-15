@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getProducts, createProduct, deleteProduct, updateStock, getPrices, createPrice, deletePrice } from '../api'
+import { getProducts, createProduct, deleteProduct, updateStock, getPrices, createPrice, deletePrice, updateProductName } from '../api'
 import { CATEGORIES, SUPERMARKETS } from '../constants'
 import TicketScanner from '../components/TicketScanner'
 
@@ -20,6 +20,8 @@ function Inventory() {
   const [pendingStock, setPendingStock] = useState({})
   const [showPriceHistory, setShowPriceHistory] = useState(null)
   const [priceHistory, setPriceHistory] = useState([])
+  const [editingName, setEditingName] = useState(null)
+  const [editingNameValue, setEditingNameValue] = useState('')
 
   useEffect(() => {
     fetchProducts()
@@ -105,7 +107,7 @@ function Inventory() {
   const handlePriceSubmit = async (productId) => {
     setPriceError(null)
     if (!priceForm.supermarket || !priceForm.price || parseFloat(priceForm.price) <= 0) {
-      setPriceError('Completa todos los campos.')
+      setPriceError('Completa todos los campos con valores válidos.')
       return
     }
     try {
@@ -139,6 +141,17 @@ function Inventory() {
     }
   }
 
+  const handleDeletePrice = async (priceId, productId) => {
+    if (!window.confirm('Eliminar este precio del historial?')) return
+    try {
+      await deletePrice(priceId)
+      const res = await getPrices(productId)
+      setPriceHistory(res.data)
+    } catch (err) {
+      console.error('Error deleting price:', err)
+    }
+  }
+
   const closePriceForm = (productId) => {
     setShowPriceForm(null)
     setPriceError(null)
@@ -152,14 +165,15 @@ function Inventory() {
     })
   }
 
-  const handleDeletePrice = async (priceId, productId) => {
-    if (!window.confirm('Eliminar este precio del historial?')) return
+  const handleNameSave = async (productId) => {
+    if (!editingNameValue.trim()) return
     try {
-      await deletePrice(priceId)
-      const res = await getPrices(productId)
-      setPriceHistory(res.data)
+      await updateProductName(productId, editingNameValue.trim())
+      setEditingName(null)
+      setEditingNameValue('')
+      fetchProducts()
     } catch (err) {
-      console.error('Error deleting price:', err)
+      console.error('Error updating name:', err)
     }
   }
 
@@ -248,11 +262,34 @@ function Inventory() {
           {products.map((product) => (
             <div key={product.id} className="product-card-wrapper">
 
-              {/* Fila principal */}
               <div className="product-card">
                 <div className="product-info">
-                  <div className="product-name" title={product.name}>{product.name}</div>
-                  {showPriceForm !== product.id && (
+                  {editingName === product.id ? (
+                    <div className="product-name-edit">
+                      <input
+                        className="product-name-input"
+                        value={editingNameValue}
+                        onChange={(e) => setEditingNameValue(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleNameSave(product.id)
+                          if (e.key === 'Escape') { setEditingName(null); setEditingNameValue('') }
+                        }}
+                        autoFocus
+                      />
+                      <button className="btn-name-save" onClick={() => handleNameSave(product.id)}>✓</button>
+                      <button className="btn-name-cancel" onClick={() => { setEditingName(null); setEditingNameValue('') }}>✕</button>
+                    </div>
+                  ) : (
+                    <div
+                      className="product-name"
+                      title={product.name}
+                      onClick={() => { setEditingName(product.id); setEditingNameValue(product.name) }}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {product.name}
+                    </div>
+                  )}
+                  {showPriceForm !== product.id && editingName !== product.id && (
                     <div className="product-meta">
                       {product.category && <span>{product.category}</span>}
                     </div>
@@ -326,11 +363,9 @@ function Inventory() {
                 </div>
               </div>
 
-              {/* Panel de precio — debajo de la fila principal */}
               {showPriceForm === product.id && (
                 <div className="price-form-container">
                   <div className="price-form">
-                    
                     {priceError && <span className="price-error">{priceError}</span>}
                     <select
                       value={priceForm.supermarket}
