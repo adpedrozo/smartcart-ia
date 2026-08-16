@@ -22,6 +22,7 @@ function Inventory() {
   const [priceHistory, setPriceHistory] = useState([])
   const [editingName, setEditingName] = useState(null)
   const [editingNameValue, setEditingNameValue] = useState('')
+  const [stockSummary, setStockSummary] = useState(null)
 
   useEffect(() => {
     fetchProducts()
@@ -41,6 +42,10 @@ function Inventory() {
         return priorityOrder[getStatus(a)] - priorityOrder[getStatus(b)]
       })
       setProducts(sorted)
+      const critical = sorted.filter(p => p.current_stock <= 0).length
+      const low = sorted.filter(p => p.current_stock > 0 && p.current_stock <= p.minimum_stock).length
+      const ok = sorted.filter(p => p.current_stock > p.minimum_stock).length
+      setStockSummary({ total: sorted.length, critical, low, ok })
     } catch (err) {
       console.error('Error fetching products:', err)
     } finally {
@@ -187,6 +192,15 @@ function Inventory() {
           {showForm ? 'Cancelar' : '+ Agregar producto'}
         </button>
       </div>
+
+      {stockSummary && (
+        <div className="inventory-summary-text">
+          {stockSummary.total} productos en inventario —
+          {stockSummary.critical > 0 && <span className="summary-critical"> {stockSummary.critical} crítico{stockSummary.critical > 1 ? 's' : ''}</span>}
+          {stockSummary.low > 0 && <span className="summary-low"> · {stockSummary.low} bajo{stockSummary.low > 1 ? 's' : ''}</span>}
+          <span className="summary-ok"> · {stockSummary.ok} en buen estado</span>
+        </div>
+      )}
 
       <TicketScanner onProductsAdded={fetchProducts} />
 

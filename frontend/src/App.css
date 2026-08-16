@@ -2,7 +2,7 @@
    SMARTCART IA — App.css
    Orden: Reset > Layout > Navbar > Buttons > Forms > Badges >
           Inventory > Shopping List > Scanner > States >
-          Price History > Inline Edit > Responsive
+          Price History > Inline Edit > Dashboard > Responsive
    ============================================================ */
 
 /* ===== RESET & BASE ===== */
@@ -64,12 +64,10 @@ body {
 }
 
 .navbar-logo {
-  font-size: 16px;
-  font-weight: bold;
-  color: #4A9EDB;
-  background-color: #2E4057;
-  padding: 4px 8px;
+  width: 32px;
+  height: 32px;
   border-radius: 6px;
+  object-fit: contain;
 }
 
 .navbar-title {
@@ -487,6 +485,17 @@ body {
   color: #E24B4A;
   background-color: transparent;
 }
+
+/* ===== INVENTORY SUMMARY TEXT ===== */
+.inventory-summary-text {
+  font-size: 13px;
+  color: #556677;
+  padding: 8px 0;
+}
+
+.summary-critical { color: #FF6B6B; font-weight: bold; }
+.summary-low { color: #5BA3D9; font-weight: bold; }
+.summary-ok { color: #6DBF67; }
 
 /* ===== PRICE FORM ===== */
 .price-form-container {
@@ -1241,6 +1250,116 @@ body {
   font-size: 11px;
   padding: 3px 10px;
   border-radius: 20px;
+}
+
+.info-logo-img {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  object-fit: contain;
+}
+
+/* ===== DASHBOARD ===== */
+.dashboard-summary {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dashboard-card {
+  flex: 1;
+  min-width: 80px;
+  border-radius: 10px;
+  border: 1px solid;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.dashboard-card-number {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.dashboard-card-label {
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dashboard-chart-box {
+  background: #1A2B3C;
+  border-radius: 10px;
+  border: 1px solid #2E4057;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dashboard-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dashboard-chart-header h3 {
+  font-size: 15px;
+  color: #4A9EDB;
+}
+
+.dashboard-select {
+  padding: 6px 12px;
+  border: 1px solid #2E4057;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+  background-color: #0F1923;
+  color: #E0E0E0;
+  cursor: pointer;
+  max-width: 260px;
+}
+
+.dashboard-select:focus {
+  border-color: #2E75B6;
+}
+
+.dashboard-empty {
+  text-align: center;
+  padding: 40px;
+  color: #556677;
+  font-size: 13px;
+}
+
+.dashboard-super-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dashboard-super-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #0F1923;
+  border-radius: 8px;
+  border: 1px solid #2E4057;
+}
+
+.dashboard-super-name {
+  font-size: 14px;
+  color: #E0E0E0;
+}
+
+.dashboard-super-price {
+  font-size: 16px;
+  font-weight: bold;
 }
 
 /* ===== RESPONSIVE MOBILE (max 480px) ===== */

@@ -9,7 +9,7 @@ function Navbar() {
     <>
       <nav className="navbar">
         <div className="navbar-brand">
-          <span className="navbar-logo">SC</span>
+          <img src="/logo.png" className="navbar-logo" alt="SmartCart IA" />
           <span className="navbar-title">SmartCart IA</span>
         </div>
         <div className="navbar-links">
@@ -25,6 +25,12 @@ function Navbar() {
           >
             Lista de compras
           </Link>
+          <Link
+            to="/dashboard"
+            className={location.pathname === '/dashboard' ? 'nav-link active' : 'nav-link'}
+          >
+            Estadísticas
+          </Link>
           <button className="btn-info" onClick={() => setShowInfo(true)}>i</button>
         </div>
       </nav>
@@ -33,7 +39,7 @@ function Navbar() {
         <div className="info-overlay" onClick={() => setShowInfo(false)}>
           <div className="info-modal" onClick={(e) => e.stopPropagation()}>
             <button className="info-close" onClick={() => setShowInfo(false)}>✕</button>
-            <div className="info-logo">SC</div>
+            <img src="/logo.png" className="info-logo-img" alt="SmartCart IA" />
             <h2 className="info-title">SmartCart IA</h2>
             <p className="info-version">Versión 1.0</p>
             <p className="info-description">

@@ -30,3 +30,7 @@ export const scanTicket = (formData) => api.post('/tickets/scan', formData, {
 export const analyzeTicket = (formData) => api.post('/tickets/analyze', formData, {
   headers: { 'Content-Type': 'multipart/form-data' }
 })
+
+// Dashboard
+export const getInventorySummary = () => api.get('/dashboard/inventory-summary')
+export const getPriceHistoryChart = (productId) => api.get(`/dashboard/price-history/${productId}`)

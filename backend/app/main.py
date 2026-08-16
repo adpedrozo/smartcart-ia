@@ -276,3 +276,35 @@ async def analyze_ticket(file: UploadFile = File(...)):
         "alerts": analysis["alerts"],
         "suggestions": analysis["suggestions"],
     }
+
+@app.get("/dashboard/inventory-summary")
+def get_inventory_summary(db: Session = Depends(get_db)):
+    products = db.query(models.Product).all()
+    summary = {"critical": 0, "urgent": 0, "low": 0, "ok": 0, "total": len(products)}
+    for p in products:
+        if p.current_stock <= 0:
+            summary["critical"] += 1
+        elif p.current_stock <= p.minimum_stock * 0.5:
+            summary["urgent"] += 1
+        elif p.current_stock <= p.minimum_stock:
+            summary["low"] += 1
+        else:
+            summary["ok"] += 1
+    return summary
+
+@app.get("/dashboard/price-history/{product_id}")
+def get_price_history_chart(product_id: int, db: Session = Depends(get_db)):
+    prices = (
+        db.query(models.Price)
+        .filter(models.Price.product_id == product_id)
+        .order_by(models.Price.recorded_at.asc())
+        .all()
+    )
+    return [
+        {
+            "date": p.recorded_at.strftime("%d/%m/%y"),
+            "price": p.price,
+            "supermarket": p.supermarket,
+        }
+        for p in prices
+    ]
