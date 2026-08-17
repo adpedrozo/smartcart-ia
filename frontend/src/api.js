@@ -24,9 +24,6 @@ export const deletePrice = (priceId) => api.delete(`/prices/${priceId}`)
 export const getShoppingList = () => api.get('/shopping-list')
 
 // Tickets
-export const scanTicket = (formData) => api.post('/tickets/scan', formData, {
-  headers: { 'Content-Type': 'multipart/form-data' }
-})
 export const analyzeTicket = (formData) => api.post('/tickets/analyze', formData, {
   headers: { 'Content-Type': 'multipart/form-data' }
 })

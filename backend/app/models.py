@@ -22,12 +22,3 @@ class Price(Base):
     supermarket = Column(String, nullable=False)
     price = Column(Float, nullable=False)
     recorded_at = Column(DateTime(timezone=True), server_default=func.now())
-
-class Ticket(Base):
-    __tablename__ = "tickets"
-
-    id = Column(Integer, primary_key=True, index=True)
-    supermarket = Column(String, nullable=True)
-    purchase_date = Column(DateTime(timezone=True), nullable=True)
-    total = Column(Float, nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
