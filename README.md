@@ -163,6 +163,14 @@ Para recrear los datos demo en una instancia nueva, ejecutar `backend/seed.sql` 
 | `GOOGLE_CREDENTIALS_JSON` | Contenido del JSON de credenciales (para deploy en Railway) |
 | `GEMINI_API_KEY` | API Key de Google AI Studio para Gemini |
 
+> **Nota:** `GOOGLE_APPLICATION_CREDENTIALS` se usa solo en desarrollo local 
+> apuntando a un archivo JSON. En producción (Railway) usar `GOOGLE_CREDENTIALS_JSON` 
+> con el contenido del archivo JSON como string.
+
+> **Nota:** En producción (Railway) usar la URL de **Connection Pooling** de Supabase 
+> (puerto 6543) en lugar de la conexión directa (puerto 5432). Se obtiene desde 
+> el dashboard de Supabase → Connect → Connection pooling.
+
 ### Frontend
 
 | Variable | Descripción |
