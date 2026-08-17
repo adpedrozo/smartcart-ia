@@ -10,7 +10,22 @@ from datetime import datetime
 # Create tables in database
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="SmartCart IA API", version="1.0.0")
+app = FastAPI(
+    title="SmartCart IA",
+    version="1.0.0",
+    description="""
+Asistente inteligente para la gestión de compras del hogar.
+
+Permite registrar tickets de supermercado mediante fotografía, controlar el stock 
+del inventario doméstico y detectar variaciones de precios a lo largo del tiempo 
+utilizando inteligencia artificial.
+
+---
+
+**Desarrollado por:** Alejandro Pedrozo
+    """,
+    swagger_ui_parameters={"defaultModelsExpandDepth": -1}
+)
 
 # CORS - allows frontend to connect
 app.add_middleware(
@@ -34,9 +49,9 @@ class PriceCreate(BaseModel):
     price: float
 
 # --- Routes ---
-@app.get("/")
+@app.get("/", summary="Health check", description="Verifica que la API está funcionando correctamente.")
 def root():
-    return {"status": "SmartCart IA API running"}
+    return {"status": "ok", "message": "SmartCart IA API running"}
 
 @app.get("/products")
 def get_products(db: Session = Depends(get_db)):
