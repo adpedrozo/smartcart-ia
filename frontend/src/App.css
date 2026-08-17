@@ -1,5 +1,5 @@
 /* ============================================================
-   SMARTCART IA — App.css
+   SMARTCART IA â€” App.css
    Orden: Reset > Layout > Navbar > Buttons > Forms > Badges >
           Inventory > Shopping List > Scanner > States >
           Price History > Inline Edit > Dashboard > Responsive
@@ -1410,7 +1410,7 @@ body {
     text-align: center;
   }
 
-  /* Product card — nombre arriba, controles abajo */
+  /* Product card â€” nombre arriba, controles abajo */
   .product-card {
     flex-direction: column;
     align-items: flex-start;
