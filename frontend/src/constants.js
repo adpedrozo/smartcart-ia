@@ -1,0 +1,31 @@
+export const CATEGORIES = [
+  'Almacén',
+  'Lacteos',
+  'Carnes',
+  'Frutas y Verduras',
+  'Limpieza',
+  'Higiene Personal',
+  'Bebidas',
+  'Congelados',
+  'Panadería',
+  'Otros',
+]
+
+export const SUPERMARKETS = [
+  'Carrefour',
+  'Changomás',
+  'Coto',
+  'Dia',
+  'Disco',
+  'Diarco',
+  'Jumbo',
+  'La Anónima',
+  'Libertad',
+  'Makro',
+  'Norte',
+  'Tadicor',
+  'Toledo',
+  'Vea',
+  'Walmart',
+  'Otro',
+]
