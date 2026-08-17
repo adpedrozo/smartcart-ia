@@ -1,4 +1,10 @@
-# SmartCart IA
+<p align="center">
+  <img src="frontend/public/logo.png" width="120" alt="SmartCart IA Logo" />
+</p>
+
+<div align="center">
+  <h1>SmartCart IA</h1>
+</div>
 
 Asistente inteligente para la gestión de compras del hogar. Permite registrar tickets de supermercado mediante fotografía, controlar el stock del inventario doméstico y detectar variaciones de precios a lo largo del tiempo utilizando inteligencia artificial.
 
@@ -6,14 +12,15 @@ Asistente inteligente para la gestión de compras del hogar. Permite registrar t
 
 ## Demo
 
-> 🔗 **Frontend:** [smartcart-ia.vercel.app](https://smartcart-ia.vercel.app) *(disponible próximamente)*
-> 🔗 **API:** [smartcart-ia.railway.app](https://smartcart-ia.railway.app) *(disponible próximamente)*
+> 🔗 **Frontend:** [smartcart-ia.vercel.app](https://smartcart-ia.vercel.app)
+> 🔗 **Backend API:** [smartcart-ia-production.up.railway.app](https://smartcart-ia-production.up.railway.app)
+> 🔗 **Documentación API:** [smartcart-ia-production.up.railway.app/docs](https://smartcart-ia-production.up.railway.app/docs)
 
 ---
 
 ## Funcionalidades
 
-- **Escaneo de tickets** — fotografiá un ticket de supermercado y el sistema extrae automáticamente los productos, precios y supermercado usando OCR + IA
+- **Escaneo de tickets** — Subí una fotografia de un ticket de supermercado y el sistema extrae automáticamente los productos, precios y supermercado usando OCR + IA
 - **Inventario inteligente** — controlá el stock de cada producto con alertas de nivel crítico, urgente y bajo
 - **Detección de cambios de precio** — el agente compara los precios del ticket con el historial y genera alertas y sugerencias contextuales
 - **Lista de compras** — lista priorizada generada automáticamente según el estado del stock, con opción de exportar como imagen o copiar al portapapeles
@@ -68,7 +75,7 @@ Sugerencias contextuales + actualización de inventario
 ### 1. Clonar el repositorio
 
 ```bash
-git clone git@github-personal:adpedrozo/smartcart-ia.git
+git clone git@github.com:adpedrozo/smartcart-ia.git
 cd smartcart-ia
 ```
 
@@ -111,12 +118,6 @@ Documentación interactiva en `http://127.0.0.1:8000/docs`
 ```bash
 cd frontend
 npm install
-```
-
-Crear el archivo `.env.local` en la carpeta `frontend/`:
-
-```env
-VITE_API_URL=http://127.0.0.1:8000
 ```
 
 Levantar el servidor de desarrollo:
@@ -175,7 +176,60 @@ Para recrear los datos demo en una instancia nueva, ejecutar `backend/seed.sql` 
 
 | Variable | Descripción |
 |---|---|
-| `VITE_API_URL` | URL base del backend (local o Railway en producción) |
+| `VITE_BACKEND_URL` | URL base del backend. En local usa `http://127.0.0.1:8000` como fallback automático si no está definida. En producción configurar con la URL de Railway. |
+
+> **Nota:** En desarrollo local no es necesario crear `.env.local` — si `VITE_BACKEND_URL` 
+> no está definida, el frontend apunta automáticamente a `http://127.0.0.1:8000`.
+
+---
+
+## Archivos ignorados por Git
+
+### Backend (`backend/.gitignore`)
+```
+# Virtual Environment
+venv/
+
+# Credentials and ENV Vars
+.env
+credentials/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# VS Code
+.vscode/
+```
+
+### Frontend (`frontend/.gitignore`)
+```
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+```
 
 ---
 
@@ -188,12 +242,15 @@ smartcart-ia/
 │   │   ├── main.py        # Endpoints FastAPI
 │   │   ├── models.py      # Modelos SQLAlchemy
 │   │   ├── database.py    # Conexión a base de datos
-│   │   ├── logic.py       # Lógica de negocio (lista de compras, alertas)
+│   │   ├── logic.py       # Lógica de negocio
 │   │   ├── ocr.py         # Procesamiento OCR con Google Vision y Gemini
 │   │   └── agent.py       # Agente de análisis de precios e inventario
-│   ├── credentials/       # Credenciales Google (no subir al repo)
+│   ├── credentials/       # Credenciales Google Vision (solo uso local)
 │   ├── requirements.txt
-│   └── .env               # Variables de entorno (no subir al repo)
+│   ├── Procfile           # Configuración de deploy para Railway
+│   ├── runtime.txt        # Versión de Python para Railway
+│   ├── seed.sql           # Datos de demo para Supabase
+│   └── .env               # Variables de entorno (solo uso local)
 ├── frontend/
 │   ├── src/
 │   │   ├── pages/
@@ -205,10 +262,10 @@ smartcart-ia/
 │   │   │   └── TicketScanner.jsx
 │   │   ├── api.js          # Funciones de llamada al backend
 │   │   ├── constants.js    # Supermercados y categorías
+│   │   ├── App.css         # Estilos globales
 │   │   └── App.jsx
-│   ├── public/
-│   │   └── logo.png
-│   └── .env.local          # Variables de entorno locales (no subir al repo)
+│   └── public/
+│       └── logo.png
 └── README.md
 ```
 
@@ -227,5 +284,5 @@ Implementa los conceptos de:
 
 ## Licencia
 
-Proyecto académico.
+Proyecto Académico.
 Desarrollado por Alejandro Pedrozo.
