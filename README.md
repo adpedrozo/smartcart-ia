@@ -12,6 +12,9 @@ Asistente inteligente para la gestión de compras del hogar. Permite registrar t
 
 ## Demo
 
+> ⚠️ **Los servicios están temporalmente en pausa.** Las URLs de demo no están disponibles en este momento.
+> Para ejecutar el proyecto localmente, seguir las instrucciones de [Instalación local](#instalación-local).
+
 > 🔗 **Frontend:** [smartcart-ia.vercel.app](https://smartcart-ia.vercel.app)
 > 🔗 **Backend API:** [smartcart-ia-production.up.railway.app](https://smartcart-ia-production.up.railway.app)
 > 🔗 **Documentación API:** [smartcart-ia-production.up.railway.app/docs](https://smartcart-ia-production.up.railway.app/docs)
